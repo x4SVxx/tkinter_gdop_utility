@@ -1,0 +1,1024 @@
+from tkinter import *
+import time
+from SETTINGS import Settings
+from BEACONS import Beacon
+from OVALS import Oval
+from WALLS import Wall
+from RECTANGLES import Rect
+
+
+class Main_project:
+
+    def Connect_Beacon(self):
+
+        for i in range(len(self.BeaconMas)):
+            for j in range(len(self.BeaconMas)):
+                if i < j:
+                    self.canvas.create_line(self.BeaconMas[i].x, self.BeaconMas[i].y, self.BeaconMas[j].x, self.BeaconMas[j].y,
+                                            width=1, fill='green', tag='Connect')
+                    time.sleep(self.SettingsConf.ConnectPause)
+                    self.canvas.update()
+
+    def __init__(self):
+
+        def Mouse_Press_DELETE(event):
+
+            for beacon in self.BeaconMas:
+                if event.x < beacon.x + beacon.BeaconSize and event.x > beacon.x - beacon.BeaconSize and \
+                        event.y < beacon.y + beacon.BeaconSize and event.y > beacon.y - beacon.BeaconSize:
+                    self.canvas.delete('Connect')
+                    self.canvas.delete(beacon.BeaconTag)
+                    self.BeaconMas.remove(beacon)
+
+            for oval in self.OvalMas:
+                if event.x < oval.x + oval.OvalSize and event.x > oval.x - oval.OvalSize and \
+                        event.y < oval.y + oval.OvalSize and event.y > oval.y - oval.OvalSize:
+                    self.canvas.delete(oval.OvalTag)
+                    self.OvalMas.remove(oval)
+
+            for wall in self.WallMas:
+                if event.x < wall.x1 + wall.CornerSize and event.x > wall.x1 - wall.CornerSize and \
+                        event.y < wall.y1 + wall.CornerSize and event.y > wall.y1 - wall.CornerSize:
+                    self.canvas.delete(wall.WallTag)
+                    self.canvas.delete(wall.CornerTag1)
+                    self.canvas.delete(wall.CornerTag2)
+                    self.WallMas.remove(wall)
+
+            for wall in self.WallMas:
+                if event.x < wall.x2 + wall.CornerSize and event.x > wall.x2 - wall.CornerSize and \
+                        event.y < wall.y2 + wall.CornerSize and event.y > wall.y2 - wall.CornerSize:
+                    self.canvas.delete(wall.WallTag)
+                    self.canvas.delete(wall.CornerTag1)
+                    self.canvas.delete(wall.CornerTag2)
+                    self.WallMas.remove(wall)
+
+            for rect in self.RectMas:
+                if event.x > rect.x1 and event.x < rect.x2  and event.y > rect.y1 and event.y < rect.y2:
+                    self.canvas.delete(rect.RectTag)
+                    self.RectMas.remove(rect)
+
+        def Mouse_Press(event):
+
+            if self.BeaconFlag == False and self.OvalFlag == False and self.WallFlag == False and self.RectFlag == False:
+                for beacon in self.BeaconMas:
+                    if event.x < beacon.x + beacon.BeaconSize and event.x > beacon.x - beacon.BeaconSize and \
+                            event.y < beacon.y + beacon.BeaconSize and event.y > beacon.y - beacon.BeaconSize:
+
+                        self.ReplaceBeaconFlag = True
+                        self.ReplaceBeacon.append(beacon)
+
+            if self.BeaconFlag == False and self.OvalFlag == False and self.WallFlag == False and self.RectFlag == False:
+                for oval in self.OvalMas:
+                    if event.x < oval.x + oval.OvalSize and event.x > oval.x - oval.OvalSize and \
+                            event.y < oval.y + oval.OvalSize and event.y > oval.y - oval.OvalSize:
+
+                        self.ReplaceOvalFlag = True
+                        self.ReplaceOval.append(oval)
+
+            if self.BeaconFlag == False and self.OvalFlag == False and self.WallFlag == False and self.RectFlag == False:
+                for wall in self.WallMas:
+                    if event.x < wall.x1 + wall.CornerSize and event.x > wall.x1 - wall.CornerSize and \
+                            event.y < wall.y1 + wall.CornerSize and event.y > wall.y1 - wall.CornerSize:
+
+                        self.ReplaceCorner1Flag = True
+                        self.ReplaceWall.append(wall)
+
+            if self.BeaconFlag == False and self.OvalFlag == False and self.WallFlag == False and self.RectFlag == False:
+                for wall in self.WallMas:
+                    if event.x < wall.x2 + wall.CornerSize and event.x > wall.x2 - wall.CornerSize and \
+                            event.y < wall.y2 + wall.CornerSize and event.y > wall.y2 - wall.CornerSize:
+
+                        self.ReplaceCorner2Flag = True
+                        self.ReplaceWall.append(wall)
+
+            if self.BeaconFlag == False and self.OvalFlag == False and self.WallFlag == False and self.RectFlag == False:
+                for rect in self.RectMas:
+                    if event.x > rect.x1 and event.x < rect.x2  and event.y > rect.y1 and event.y < rect.y2:
+
+                        self.ReplaceRectFlag = True
+                        self.ReplaceRect.append(rect)
+                        self.RectWidth = rect.x2 - rect.x1
+                        self.RectHeight = rect.y2 - rect.y1
+                        self.DeltaRectWidth = event.x - rect.x1
+                        self.DeltaRectHeight = event.y - rect.y1
+
+            if self.BeaconFlag:
+                PointXY = (event.x, event.y)
+                BeaconPos = list(PointXY)
+                self.BeaconCount += 1
+                NewBeacon = Beacon(BeaconPos, self.BeaconCount, self.SettingsConf.BeaconSize,
+                                   self.SettingsConf.BeaconColor)
+                self.BeaconMas.append(NewBeacon)
+                NewBeacon.DrawBeacon(self.canvas)
+
+            elif self.OvalFlag:
+                PointXY = (event.x, event.y)
+                OvalPos = list(PointXY)
+                self.OvalCount += 1
+                NewOval = Oval(OvalPos, self.OvalCount, self.SettingsConf.OvalSize, self.SettingsConf.OvalWidth,
+                               self.SettingsConf.OvalColor)
+                self.OvalMas.append(NewOval)
+                NewOval.DrawOval(self.canvas)
+
+            elif self.WallFlag:
+                PointXY = (event.x, event.y)
+                self.WallPosSTART = list(PointXY)
+                self.WallMotionFlag = True
+
+            elif self.RectFlag:
+                PointXY = (event.x, event.y)
+                self.RectPosSTART = list(PointXY)
+                self.RectMotionFlag = True
+
+        def Mouse_Release(event):
+
+            if self.ReplaceBeaconFlag:
+
+                self.ReplaceBeaconFlag = False
+                self.canvas.delete(self.ReplaceBeacon[0].BeaconTag)
+                self.canvas.delete('Connect')
+
+                if event.x < self.ReplaceBeacon[0].BeaconSize + 3 and \
+                        event.y < self.ReplaceBeacon[0].BeaconSize + 3:
+                    self.ReplaceBeacon[0].x = self.ReplaceBeacon[0].BeaconSize + 3
+                    self.ReplaceBeacon[0].y = self.ReplaceBeacon[0].BeaconSize + 3
+                elif event.x < self.ReplaceBeacon[0].BeaconSize + 3 and \
+                        event.y > self.canvas.winfo_height() - self.ReplaceBeacon[0].BeaconSize - 3:
+                    self.ReplaceBeacon[0].x = self.ReplaceBeacon[0].BeaconSize + 3
+                    self.ReplaceBeacon[0].y = self.canvas.winfo_height() - self.ReplaceBeacon[0].BeaconSize - 3
+                elif event.x > self.canvas.winfo_width() - self.ReplaceBeacon[0].BeaconSize - 3 and \
+                        event.y < self.ReplaceBeacon[0].BeaconSize + 3:
+                    self.ReplaceBeacon[0].x = self.canvas.winfo_width() - self.ReplaceBeacon[0].BeaconSize - 3
+                    self.ReplaceBeacon[0].y = self.ReplaceBeacon[0].BeaconSize + 3
+                elif event.x > self.canvas.winfo_width() - self.ReplaceBeacon[0].BeaconSize - 3 and \
+                        event.y > self.canvas.winfo_height() - self.ReplaceBeacon[0].BeaconSize - 3:
+                    self.ReplaceBeacon[0].x = self.canvas.winfo_width() - self.ReplaceBeacon[0].BeaconSize - 3
+                    self.ReplaceBeacon[0].y = self.canvas.winfo_height() - self.ReplaceBeacon[0].BeaconSize - 3
+                elif event.x < self.ReplaceBeacon[0].BeaconSize + 3:
+                    self.ReplaceBeacon[0].x = self.ReplaceBeacon[0].BeaconSize + 3
+                    self.ReplaceBeacon[0].y = event.y
+                elif event.x > self.canvas.winfo_width() - self.ReplaceBeacon[0].BeaconSize - 3:
+                    self.ReplaceBeacon[0].x = self.canvas.winfo_width() - self.ReplaceBeacon[0].BeaconSize - 3
+                    self.ReplaceBeacon[0].y = event.y
+                elif event.y < self.ReplaceBeacon[0].BeaconSize + 3:
+                    self.ReplaceBeacon[0].x = event.x
+                    self.ReplaceBeacon[0].y = self.ReplaceBeacon[0].BeaconSize + 3
+                elif event.y > self.canvas.winfo_height() - self.ReplaceBeacon[0].BeaconSize - 3:
+                    self.ReplaceBeacon[0].x = event.x
+                    self.ReplaceBeacon[0].y = self.canvas.winfo_height() - self.ReplaceBeacon[0].BeaconSize - 3
+                else:
+                    self.canvas.delete(self.ReplaceBeacon[0].BeaconTag)
+                    self.ReplaceBeacon[0].x = event.x
+                    self.ReplaceBeacon[0].y = event.y
+
+                self.ReplaceBeacon[0].DrawBeacon(self.canvas)
+                self.ReplaceBeacon.pop(0)
+
+            if self.ReplaceOvalFlag:
+
+                self.ReplaceOvalFlag = False
+
+                if event.x < self.ReplaceOval[0].OvalSize + 3 and \
+                        event.y < self.ReplaceOval[0].OvalSize + 3:
+                    self.canvas.delete(self.ReplaceOval[0].OvalTag)
+                    self.ReplaceOval[0].x = self.ReplaceOval[0].OvalSize + 3
+                    self.ReplaceOval[0].y = self.ReplaceOval[0].OvalSize + 3
+                    self.ReplaceOval[0].DrawOval(self.canvas)
+                elif event.x < self.ReplaceOval[0].OvalSize + 3 and \
+                        event.y > self.canvas.winfo_height() - self.ReplaceOval[0].OvalSize - 3:
+                    self.canvas.delete(self.ReplaceOval[0].OvalTag)
+                    self.ReplaceOval[0].x = self.ReplaceOval[0].OvalSize + 3
+                    self.ReplaceOval[0].y = self.canvas.winfo_height() - self.ReplaceOval[0].OvalSize - 3
+                    self.ReplaceOval[0].DrawOval(self.canvas)
+                elif event.x > self.canvas.winfo_width() - self.ReplaceOval[0].OvalSize - 3 and \
+                        event.y < self.ReplaceOval[0].OvalSize + 3:
+                    self.canvas.delete(self.ReplaceOval[0].OvalTag)
+                    self.ReplaceOval[0].x = self.canvas.winfo_width() - self.ReplaceOval[0].OvalSize - 3
+                    self.ReplaceOval[0].y = self.ReplaceOval[0].OvalSize + 3
+                    self.ReplaceOval[0].DrawOval(self.canvas)
+                elif event.x > self.canvas.winfo_width() - self.ReplaceOval[0].OvalSize - 3 and \
+                        event.y > self.canvas.winfo_height() - self.ReplaceOval[0].OvalSize - 3:
+                    self.canvas.delete(self.ReplaceOval[0].OvalTag)
+                    self.ReplaceOval[0].x = self.canvas.winfo_width() - self.ReplaceOval[0].OvalSize - 3
+                    self.ReplaceOval[0].y = self.canvas.winfo_height() - self.ReplaceOval[0].OvalSize - 3
+                    self.ReplaceOval[0].DrawOval(self.canvas)
+                elif event.x < self.ReplaceOval[0].OvalSize + 3:
+                    self.canvas.delete(self.ReplaceOval[0].OvalTag)
+                    self.ReplaceOval[0].x = self.ReplaceOval[0].OvalSize + 3
+                    self.ReplaceOval[0].y = event.y
+                    self.ReplaceOval[0].DrawOval(self.canvas)
+                elif event.x > self.canvas.winfo_width() - self.ReplaceOval[0].OvalSize - 3:
+                    self.canvas.delete(self.ReplaceOval[0].OvalTag)
+                    self.ReplaceOval[0].x = self.canvas.winfo_width() - self.ReplaceOval[0].OvalSize - 3
+                    self.ReplaceOval[0].y = event.y
+                    self.ReplaceOval[0].DrawOval(self.canvas)
+                elif event.y < self.ReplaceOval[0].OvalSize + 3:
+                    self.canvas.delete(self.ReplaceOval[0].OvalTag)
+                    self.ReplaceOval[0].x = event.x
+                    self.ReplaceOval[0].y = self.ReplaceOval[0].OvalSize + 3
+                    self.ReplaceOval[0].DrawOval(self.canvas)
+                elif event.y > self.canvas.winfo_height() - self.ReplaceOval[0].OvalSize - 3:
+                    self.canvas.delete(self.ReplaceOval[0].OvalTag)
+                    self.ReplaceOval[0].x = event.x
+                    self.ReplaceOval[0].y = self.canvas.winfo_height() - self.ReplaceOval[0].OvalSize - 3
+                    self.ReplaceOval[0].DrawOval(self.canvas)
+                else:
+                    self.canvas.delete(self.ReplaceOval[0].OvalTag)
+                    self.ReplaceOval[0].x = event.x
+                    self.ReplaceOval[0].y = event.y
+                    self.ReplaceOval[0].DrawOval(self.canvas)
+
+                self.ReplaceOval.pop(0)
+
+            if self.ReplaceCorner1Flag:
+
+                self.ReplaceCorner1Flag = False
+                self.canvas.delete(self.ReplaceWall[0].CornerTag1)
+                self.canvas.delete(self.ReplaceWall[0].CornerTag2)
+                self.canvas.delete(self.ReplaceWall[0].WallTag)
+
+                if event.x < self.SettingsConf.CornerSize + 3 and \
+                        event.y < self.SettingsConf.CornerSize + 3:
+                    self.ReplaceWall[0].x1 = self.SettingsConf.CornerSize + 3
+                    self.ReplaceWall[0].y1 = self.SettingsConf.CornerSize + 3
+                elif event.x < self.SettingsConf.CornerSize + 3 and \
+                        event.y > self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3:
+                    self.ReplaceWall[0].x1 = self.SettingsConf.CornerSize + 3
+                    self.ReplaceWall[0].y1 = self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3
+                elif event.x > self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3 and \
+                        event.y < self.SettingsConf.CornerSize + 3:
+                    self.ReplaceWall[0].x1 = self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3
+                    self.ReplaceWall[0].y1 = self.SettingsConf.CornerSize + 3
+                elif event.x > self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3 and \
+                        event.y > self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3:
+                    self.ReplaceWall[0].x1 = self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3
+                    self.ReplaceWall[0].y1 = self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3
+                elif event.x < self.SettingsConf.CornerSize + 3:
+                    self.ReplaceWall[0].x1 = self.SettingsConf.CornerSize + 3
+                    self.ReplaceWall[0].y1 = event.y
+                elif event.x > self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3:
+                    self.ReplaceWall[0].x1 = self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3
+                    self.ReplaceWall[0].y1 = event.y
+                elif event.y < self.SettingsConf.CornerSize + 3:
+                    self.ReplaceWall[0].x1 = event.x
+                    self.ReplaceWall[0].y1 = self.SettingsConf.CornerSize + 3
+                elif event.y > self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3:
+                    self.ReplaceWall[0].x1 = event.x
+                    self.ReplaceWall[0].y1 = self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3
+                else:
+                    self.ReplaceWall[0].x1 = event.x
+                    self.ReplaceWall[0].y1 = event.y
+
+                self.ReplaceWall[0].DrawWall(self.canvas)
+                self.ReplaceWall.pop(0)
+
+            if self.ReplaceCorner2Flag:
+
+                self.ReplaceCorner2Flag = False
+                self.canvas.delete(self.ReplaceWall[0].CornerTag1)
+                self.canvas.delete(self.ReplaceWall[0].CornerTag2)
+                self.canvas.delete(self.ReplaceWall[0].WallTag)
+
+                if event.x < self.SettingsConf.CornerSize + 3 and \
+                        event.y < self.SettingsConf.CornerSize + 3:
+                    self.ReplaceWall[0].x2 = self.SettingsConf.CornerSize + 3
+                    self.ReplaceWall[0].y2 = self.SettingsConf.CornerSize + 3
+                elif event.x < self.SettingsConf.CornerSize + 3 and \
+                        event.y > self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3:
+                    self.ReplaceWall[0].x2 = self.SettingsConf.CornerSize + 3
+                    self.ReplaceWall[0].y2 = self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3
+                elif event.x > self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3 and \
+                        event.y < self.SettingsConf.CornerSize + 3:
+                    self.ReplaceWall[0].x2 = self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3
+                    self.ReplaceWall[0].y2 = self.SettingsConf.CornerSize + 3
+                elif event.x > self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3 and \
+                        event.y > self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3:
+                    self.ReplaceWall[0].x2 = self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3
+                    self.ReplaceWall[0].y2 = self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3
+                elif event.x < self.SettingsConf.CornerSize + 3:
+                    self.ReplaceWall[0].x2 = self.SettingsConf.CornerSize + 3
+                    self.ReplaceWall[0].y2 = event.y
+                elif event.x > self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3:
+                    self.ReplaceWall[0].x2 = self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3
+                    self.ReplaceWall[0].y2 = event.y
+                elif event.y < self.SettingsConf.CornerSize + 3:
+                    self.ReplaceWall[0].x2 = event.x
+                    self.ReplaceWall[0].y2 = self.SettingsConf.CornerSize + 3
+                elif event.y > self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3:
+                    self.ReplaceWall[0].x2 = event.x
+                    self.ReplaceWall[0].y2 = self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3
+                else:
+                    self.ReplaceWall[0].x2 = event.x
+                    self.ReplaceWall[0].y2 = event.y
+
+                self.ReplaceWall[0].DrawWall(self.canvas)
+                self.ReplaceWall.pop(0)
+
+            if self.ReplaceRectFlag:
+
+                self.ReplaceRectFlag = False
+                self.canvas.delete(self.ReplaceRect[0].RectTag)
+
+                if event.x < self.DeltaRectWidth + 3 and \
+                        event.y < self.DeltaRectHeight + 3:
+                    self.ReplaceRect[0].x1 = 3
+                    self.ReplaceRect[0].x2 = 3 + self.RectWidth
+                    self.ReplaceRect[0].y1 = 3
+                    self.ReplaceRect[0].y2 = 3 + self.RectHeight
+                elif event.x < self.DeltaRectWidth + 3 and \
+                        event.y > self.canvas.winfo_height() - (self.RectHeight - self.DeltaRectHeight) - 3:
+                    self.ReplaceRect[0].x1 = 3
+                    self.ReplaceRect[0].x2 = 3 + self.RectWidth
+                    self.ReplaceRect[0].y1 = self.canvas.winfo_height() - 3 - self.RectHeight
+                    self.ReplaceRect[0].y2 = self.canvas.winfo_height() - 3
+                elif event.x > self.canvas.winfo_width() - (self.RectWidth - self.DeltaRectWidth) - 3 and \
+                        event.y < self.DeltaRectHeight + 3:
+                    self.ReplaceRect[0].x1 = self.canvas.winfo_width() - self.RectWidth - 3
+                    self.ReplaceRect[0].x2 = self.canvas.winfo_width() - 3
+                    self.ReplaceRect[0].y1 = 3
+                    self.ReplaceRect[0].y2 = 3 + self.RectHeight
+                elif event.x > self.canvas.winfo_width() - (self.RectWidth - self.DeltaRectWidth) - 3 and \
+                        event.y > self.canvas.winfo_height() - (self.RectHeight - self.DeltaRectHeight) - 3:
+                    self.ReplaceRect[0].x1 = self.canvas.winfo_width() - self.RectWidth - 3
+                    self.ReplaceRect[0].x2 = self.canvas.winfo_width() - 3
+                    self.ReplaceRect[0].y1 = self.canvas.winfo_height() - 3 - self.RectHeight
+                    self.ReplaceRect[0].y2 = self.canvas.winfo_height() - 3
+                elif event.x < self.DeltaRectWidth + 3:
+                    self.ReplaceRect[0].x1 = 3
+                    self.ReplaceRect[0].x2 = 3 + self.RectWidth
+                    self.ReplaceRect[0].y1 = event.y - self.DeltaRectHeight
+                    self.ReplaceRect[0].y2 = event.y + (self.RectHeight - self.DeltaRectHeight)
+                elif event.x > self.canvas.winfo_width() - (self.RectWidth - self.DeltaRectWidth) - 3:
+                    self.ReplaceRect[0].x1 = self.canvas.winfo_width() - self.RectWidth - 3
+                    self.ReplaceRect[0].x2 = self.canvas.winfo_width() - 3
+                    self.ReplaceRect[0].y1 = event.y - self.DeltaRectHeight
+                    self.ReplaceRect[0].y2 = event.y + (self.RectHeight - self.DeltaRectHeight)
+                elif event.y < self.DeltaRectHeight + 3:
+                    self.ReplaceRect[0].x1 = event.x - self.DeltaRectWidth
+                    self.ReplaceRect[0].x2 = event.x + (self.RectWidth - self.DeltaRectWidth)
+                    self.ReplaceRect[0].y1 = 3
+                    self.ReplaceRect[0].y2 = 3 + self.RectHeight
+                elif event.y > self.canvas.winfo_height() - (self.RectHeight - self.DeltaRectHeight) - 3:
+                    self.ReplaceRect[0].x1 = event.x - self.DeltaRectWidth
+                    self.ReplaceRect[0].x2 = event.x + (self.RectWidth - self.DeltaRectWidth)
+                    self.ReplaceRect[0].y1 = self.canvas.winfo_height() - 3 - self.RectHeight
+                    self.ReplaceRect[0].y2 = self.canvas.winfo_height() - 3
+                else:
+                    self.ReplaceRect[0].x1 = event.x - self.DeltaRectWidth
+                    self.ReplaceRect[0].x2 = self.ReplaceRect[0].x1 + self.RectWidth
+                    self.ReplaceRect[0].y1 = event.y - self.DeltaRectHeight
+                    self.ReplaceRect[0].y2 = self.ReplaceRect[0].y1 + self.RectHeight
+
+                self.ReplaceRect[0].DrawRect(self.canvas)
+                self.ReplaceRect.pop(0)
+
+            if self.WallMotionFlag:
+
+                self.WallMotionFlag = False
+                self.canvas.delete('Line')
+                PointXY = (event.x, event.y)
+                self.WallPosFINISH = list(PointXY)
+
+                if event.x < self.SettingsConf.CornerSize + 3 and \
+                        event.y < self.SettingsConf.CornerSize + 3:
+                    self.WallPosFINISH[0] = self.SettingsConf.CornerSize + 3
+                    self.WallPosFINISH[1] = self.SettingsConf.CornerSize + 3
+                elif event.x < self.SettingsConf.CornerSize + 3 and \
+                        event.y > self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3:
+                    self.WallPosFINISH[0] = self.SettingsConf.CornerSize + 3
+                    self.WallPosFINISH[1] = self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3
+                elif event.x > self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3 and \
+                        event.y < self.SettingsConf.CornerSize + 3:
+                    self.WallPosFINISH[0] = self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3
+                    self.WallPosFINISH[1] = self.SettingsConf.CornerSize + 3
+                elif event.x > self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3 and \
+                        event.y > self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3:
+                    self.WallPosFINISH[0] = self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3
+                    self.WallPosFINISH[1] = self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3
+                elif event.x < self.SettingsConf.CornerSize + 3:
+                    self.WallPosFINISH[0] = self.SettingsConf.CornerSize + 3
+                    self.WallPosFINISH[1] = event.y
+                elif event.x > self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3:
+                    self.WallPosFINISH[0] = self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3
+                    self.WallPosFINISH[1] = event.y
+                elif event.y < self.SettingsConf.CornerSize + 3:
+                    self.WallPosFINISH[0] = event.x
+                    self.WallPosFINISH[1] = self.SettingsConf.CornerSize + 3
+                elif event.y > self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3:
+                    self.WallPosFINISH[0] = event.x
+                    self.WallPosFINISH[1] = self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3
+                else:
+                    self.WallPosFINISH[0] = event.x
+                    self.WallPosFINISH[1] = event.y
+
+                self.WallCount += 1
+                NewWall = Wall(self.WallPosSTART, self.WallPosFINISH, self.WallCount, self.SettingsConf.WallWidth,
+                               self.SettingsConf.WallColor, self.SettingsConf.CornerSize)
+                self.WallMas.append(NewWall)
+                NewWall.DrawWall(self.canvas)
+
+            if self.RectMotionFlag:
+
+                self.RectMotionFlag = False
+                self.canvas.delete('Rect')
+                PointXY = (event.x, event.y)
+                self.RectPosFINISH = list(PointXY)
+
+                if event.x < + 3 and event.y < 3:
+                    self.RectPosFINISH[0] = 3
+                    self.RectPosFINISH[1] = 3
+                elif event.x < 3 and event.y > self.canvas.winfo_height() - 3:
+                    self.RectPosFINISH[0] = 3
+                    self.RectPosFINISH[1] = self.canvas.winfo_height() - 3
+                elif event.x > self.canvas.winfo_width() - 3 and event.y < 3:
+                    self.RectPosFINISH[0] = self.canvas.winfo_width() - 3
+                    self.RectPosFINISH[1] = 3
+                elif event.x > self.canvas.winfo_width() - 3 and event.y > self.canvas.winfo_height() - 3:
+                    self.RectPosFINISH[0] = self.canvas.winfo_width() - 3
+                    self.RectPosFINISH[1] = self.canvas.winfo_height() - 3
+                elif event.x < 3:
+                    self.RectPosFINISH[0] = 3
+                    self.RectPosFINISH[1] = event.y
+                elif event.x > self.canvas.winfo_width() - 3:
+                    self.RectPosFINISH[0] = self.canvas.winfo_width() - 3
+                    self.RectPosFINISH[1] = event.y
+                elif event.y < 3:
+                    self.RectPosFINISH[0] = event.x
+                    self.RectPosFINISH[1] = 3
+                elif event.y > self.canvas.winfo_height() - 3:
+                    self.RectPosFINISH[0] = event.x
+                    self.RectPosFINISH[1] = self.canvas.winfo_height() - 3
+                else:
+                    self.RectPosFINISH[0] = event.x
+                    self.RectPosFINISH[1] = event.y
+
+                self.CloneRectPosX = self.RectPosFINISH[0]
+                self.CloneRectPosY = self.RectPosFINISH[1]
+                if self.RectPosFINISH[0] < self.RectPosSTART[0]:
+                    self.RectPosFINISH[0] = self.RectPosSTART[0]
+                    self.RectPosSTART[0] = self.CloneRectPosX
+                if self.RectPosFINISH[1] < self.RectPosSTART[1]:
+                    self.RectPosFINISH[1] = self.RectPosSTART[1]
+                    self.RectPosSTART[1] = self.CloneRectPosY
+
+                self.RectCount += 1
+                NewRect = Rect(self.RectPosSTART, self.RectPosFINISH, self.RectCount, self.SettingsConf.RectWidth,
+                               self.SettingsConf.RectColor)
+                self.RectMas.append(NewRect)
+                NewRect.DrawRect(self.canvas)
+
+        def Mouse_Motion(event):
+
+            if self.ReplaceBeaconFlag:
+
+                self.canvas.delete('Connect')
+                self.canvas.delete(self.ReplaceBeacon[0].BeaconTag)
+
+                if event.x < self.ReplaceBeacon[0].BeaconSize + 3 and \
+                        event.y < self.ReplaceBeacon[0].BeaconSize + 3:
+                    self.ReplaceBeacon[0].x = self.ReplaceBeacon[0].BeaconSize + 3
+                    self.ReplaceBeacon[0].y = self.ReplaceBeacon[0].BeaconSize + 3
+                elif event.x < self.ReplaceBeacon[0].BeaconSize + 3 and \
+                        event.y > self.canvas.winfo_height() - self.ReplaceBeacon[0].BeaconSize - 3:
+                    self.ReplaceBeacon[0].x = self.ReplaceBeacon[0].BeaconSize + 3
+                    self.ReplaceBeacon[0].y = self.canvas.winfo_height() - self.ReplaceBeacon[0].BeaconSize - 3
+                elif event.x > self.canvas.winfo_width() - self.ReplaceBeacon[0].BeaconSize - 3 and \
+                        event.y < self.ReplaceBeacon[0].BeaconSize + 3:
+                    self.ReplaceBeacon[0].x = self.canvas.winfo_width() - self.ReplaceBeacon[0].BeaconSize - 3
+                    self.ReplaceBeacon[0].y = self.ReplaceBeacon[0].BeaconSize + 3
+                elif event.x > self.canvas.winfo_width() - self.ReplaceBeacon[0].BeaconSize - 3 and \
+                        event.y > self.canvas.winfo_height() - self.ReplaceBeacon[0].BeaconSize - 3:
+                    self.ReplaceBeacon[0].x = self.canvas.winfo_width() - self.ReplaceBeacon[0].BeaconSize - 3
+                    self.ReplaceBeacon[0].y = self.canvas.winfo_height() - self.ReplaceBeacon[0].BeaconSize - 3
+                elif event.x < self.ReplaceBeacon[0].BeaconSize + 3:
+                    self.ReplaceBeacon[0].x = self.ReplaceBeacon[0].BeaconSize + 3
+                    self.ReplaceBeacon[0].y = event.y
+                elif event.x > self.canvas.winfo_width() - self.ReplaceBeacon[0].BeaconSize - 3:
+                    self.ReplaceBeacon[0].x = self.canvas.winfo_width() - self.ReplaceBeacon[0].BeaconSize - 3
+                    self.ReplaceBeacon[0].y = event.y
+                elif event.y < self.ReplaceBeacon[0].BeaconSize + 3:
+                    self.ReplaceBeacon[0].x = event.x
+                    self.ReplaceBeacon[0].y = self.ReplaceBeacon[0].BeaconSize + 3
+                elif event.y > self.canvas.winfo_height() - self.ReplaceBeacon[0].BeaconSize - 3:
+                    self.ReplaceBeacon[0].x = event.x
+                    self.ReplaceBeacon[0].y = self.canvas.winfo_height() - self.ReplaceBeacon[0].BeaconSize - 3
+                else:
+                    self.ReplaceBeacon[0].x = event.x
+                    self.ReplaceBeacon[0].y = event.y
+
+                self.ReplaceBeacon[0].DrawBeacon(self.canvas)
+
+            if self.ReplaceOvalFlag:
+
+                self.canvas.delete(self.ReplaceOval[0].OvalTag)
+
+                if event.x < self.ReplaceOval[0].OvalSize + 3 and \
+                        event.y < self.ReplaceOval[0].OvalSize + 3:
+                    self.ReplaceOval[0].x = self.ReplaceOval[0].OvalSize + 3
+                    self.ReplaceOval[0].y = self.ReplaceOval[0].OvalSize + 3
+                elif event.x < self.ReplaceOval[0].OvalSize + 3 and \
+                        event.y > self.canvas.winfo_height() - self.ReplaceOval[0].OvalSize - 3:
+                    self.ReplaceOval[0].x = self.ReplaceOval[0].OvalSize + 3
+                    self.ReplaceOval[0].y = self.canvas.winfo_height() - self.ReplaceOval[0].OvalSize - 3
+                elif event.x > self.canvas.winfo_width() - self.ReplaceOval[0].OvalSize - 3 and \
+                        event.y < self.ReplaceOval[0].OvalSize + 3:
+                    self.ReplaceOval[0].x = self.canvas.winfo_width() - self.ReplaceOval[0].OvalSize - 3
+                    self.ReplaceOval[0].y = self.ReplaceOval[0].OvalSize + 3
+                elif event.x > self.canvas.winfo_width() - self.ReplaceOval[0].OvalSize - 3 and \
+                        event.y > self.canvas.winfo_height() - self.ReplaceOval[0].OvalSize - 3:
+                    self.ReplaceOval[0].x = self.canvas.winfo_width() - self.ReplaceOval[0].OvalSize - 3
+                    self.ReplaceOval[0].y = self.canvas.winfo_height() - self.ReplaceOval[0].OvalSize - 3
+                elif event.x < self.ReplaceOval[0].OvalSize + 3:
+                    self.ReplaceOval[0].x = self.ReplaceOval[0].OvalSize + 3
+                    self.ReplaceOval[0].y = event.y
+                elif event.x > self.canvas.winfo_width() - self.ReplaceOval[0].OvalSize - 3:
+                    self.ReplaceOval[0].x = self.canvas.winfo_width() - self.ReplaceOval[0].OvalSize - 3
+                    self.ReplaceOval[0].y = event.y
+                elif event.y < self.ReplaceOval[0].OvalSize + 3:
+                    self.ReplaceOval[0].x = event.x
+                    self.ReplaceOval[0].y = self.ReplaceOval[0].OvalSize + 3
+                elif event.y > self.canvas.winfo_height() - self.ReplaceOval[0].OvalSize - 3:
+                    self.ReplaceOval[0].x = event.x
+                    self.ReplaceOval[0].y = self.canvas.winfo_height() - self.ReplaceOval[0].OvalSize - 3
+                else:
+                    self.ReplaceOval[0].x = event.x
+                    self.ReplaceOval[0].y = event.y
+
+                self.ReplaceOval[0].DrawOval(self.canvas)
+
+            if self.ReplaceCorner1Flag:
+
+                self.canvas.delete(self.ReplaceWall[0].CornerTag1)
+                self.canvas.delete(self.ReplaceWall[0].CornerTag2)
+                self.canvas.delete(self.ReplaceWall[0].WallTag)
+
+                if event.x < self.SettingsConf.CornerSize + 3 and \
+                        event.y < self.SettingsConf.CornerSize + 3:
+                    self.ReplaceWall[0].x1 = self.SettingsConf.CornerSize + 3
+                    self.ReplaceWall[0].y1 = self.SettingsConf.CornerSize + 3
+                elif event.x < self.SettingsConf.CornerSize + 3 and \
+                        event.y > self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3:
+                    self.ReplaceWall[0].x1 = self.SettingsConf.CornerSize + 3
+                    self.ReplaceWall[0].y1 = self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3
+                elif event.x > self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3 and \
+                        event.y < self.SettingsConf.CornerSize + 3:
+                    self.ReplaceWall[0].x1 = self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3
+                    self.ReplaceWall[0].y1 = self.SettingsConf.CornerSize + 3
+                elif event.x > self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3 and \
+                        event.y > self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3:
+                    self.ReplaceWall[0].x1 = self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3
+                    self.ReplaceWall[0].y1 = self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3
+                elif event.x < self.SettingsConf.CornerSize + 3:
+                    self.ReplaceWall[0].x1 = self.SettingsConf.CornerSize + 3
+                    self.ReplaceWall[0].y1 = event.y
+                elif event.x > self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3:
+                    self.ReplaceWall[0].x1 = self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3
+                    self.ReplaceWall[0].y1 = event.y
+                elif event.y < self.SettingsConf.CornerSize + 3:
+                    self.ReplaceWall[0].x1 = event.x
+                    self.ReplaceWall[0].y1 = self.SettingsConf.CornerSize + 3
+                elif event.y > self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3:
+                    self.ReplaceWall[0].x1 = event.x
+                    self.ReplaceWall[0].y1 = self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3
+                else:
+                    self.ReplaceWall[0].x1 = event.x
+                    self.ReplaceWall[0].y1 = event.y
+
+                self.ReplaceWall[0].DrawWall(self.canvas)
+
+            if self.ReplaceCorner2Flag:
+
+                self.canvas.delete(self.ReplaceWall[0].CornerTag1)
+                self.canvas.delete(self.ReplaceWall[0].CornerTag2)
+                self.canvas.delete(self.ReplaceWall[0].WallTag)
+
+                if event.x < self.SettingsConf.CornerSize + 3 and \
+                        event.y < self.SettingsConf.CornerSize + 3:
+                    self.ReplaceWall[0].x2 = self.SettingsConf.CornerSize + 3
+                    self.ReplaceWall[0].y2 = self.SettingsConf.CornerSize + 3
+                elif event.x < self.SettingsConf.CornerSize + 3 and \
+                        event.y > self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3:
+                    self.ReplaceWall[0].x2 = self.SettingsConf.CornerSize + 3
+                    self.ReplaceWall[0].y2 = self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3
+                elif event.x > self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3 and \
+                        event.y < self.SettingsConf.CornerSize + 3:
+                    self.ReplaceWall[0].x2 = self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3
+                    self.ReplaceWall[0].y2 = self.SettingsConf.CornerSize + 3
+                elif event.x > self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3 and \
+                        event.y > self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3:
+                    self.ReplaceWall[0].x2 = self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3
+                    self.ReplaceWall[0].y2 = self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3
+                elif event.x < self.SettingsConf.CornerSize + 3:
+                    self.ReplaceWall[0].x2 = self.SettingsConf.CornerSize + 3
+                    self.ReplaceWall[0].y2 = event.y
+                elif event.x > self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3:
+                    self.ReplaceWall[0].x2 = self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3
+                    self.ReplaceWall[0].y2 = event.y
+                elif event.y < self.SettingsConf.CornerSize + 3:
+                    self.ReplaceWall[0].x2 = event.x
+                    self.ReplaceWall[0].y2 = self.SettingsConf.CornerSize + 3
+                elif event.y > self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3:
+                    self.ReplaceWall[0].x2 = event.x
+                    self.ReplaceWall[0].y2 = self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3
+                else:
+                    self.ReplaceWall[0].x2 = event.x
+                    self.ReplaceWall[0].y2 = event.y
+
+                self.ReplaceWall[0].DrawWall(self.canvas)
+
+            if self.ReplaceRectFlag:
+
+                self.canvas.delete(self.ReplaceRect[0].RectTag)
+
+                if event.x < self.DeltaRectWidth + 3 and event.y < self.DeltaRectHeight + 3:
+                    self.ReplaceRect[0].x1 = 3
+                    self.ReplaceRect[0].x2 = 3 + self.RectWidth
+                    self.ReplaceRect[0].y1 = 3
+                    self.ReplaceRect[0].y2 = 3 + self.RectHeight
+                elif event.x < self.DeltaRectWidth + 3 and \
+                        event.y > self.canvas.winfo_height() - (self.RectHeight - self.DeltaRectHeight) - 3:
+                    self.ReplaceRect[0].x1 = 3
+                    self.ReplaceRect[0].x2 = 3 + self.RectWidth
+                    self.ReplaceRect[0].y1 = self.canvas.winfo_height() - 3
+                    self.ReplaceRect[0].y2 = self.canvas.winfo_height() - 3 - self.RectHeight
+                elif event.x > self.canvas.winfo_width() - (self.RectWidth - self.DeltaRectWidth) - 3 and \
+                        event.y < self.DeltaRectHeight + 3:
+                    self.ReplaceRect[0].x1 = self.canvas.winfo_width() - self.RectWidth - 3
+                    self.ReplaceRect[0].x2 = self.canvas.winfo_width() - 3
+                    self.ReplaceRect[0].y1 = 3
+                    self.ReplaceRect[0].y2 = 3 + self.RectHeight
+                elif event.x > self.canvas.winfo_width() - (self.RectWidth - self.DeltaRectWidth) - 3 and \
+                        event.y > self.canvas.winfo_height() - (self.RectHeight - self.DeltaRectHeight) - 3:
+                    self.ReplaceRect[0].x1 = self.canvas.winfo_width() - self.RectWidth - 3
+                    self.ReplaceRect[0].x2 = self.canvas.winfo_width() - 3
+                    self.ReplaceRect[0].y1 = self.canvas.winfo_height() - 3
+                    self.ReplaceRect[0].y2 = self.canvas.winfo_height() - 3 - self.RectHeight
+                elif event.x < self.DeltaRectWidth + 3:
+                    self.ReplaceRect[0].x1 = 3
+                    self.ReplaceRect[0].x2 = 3 + self.RectWidth
+                    self.ReplaceRect[0].y1 = event.y - self.DeltaRectHeight
+                    self.ReplaceRect[0].y2 = event.y + (self.RectHeight - self.DeltaRectHeight)
+                elif event.x > self.canvas.winfo_width() - (self.RectWidth - self.DeltaRectWidth) - 3:
+                    self.ReplaceRect[0].x1 = self.canvas.winfo_width() - self.RectWidth - 3
+                    self.ReplaceRect[0].x2 = self.canvas.winfo_width() - 3
+                    self.ReplaceRect[0].y1 = event.y - self.DeltaRectHeight
+                    self.ReplaceRect[0].y2 = event.y + (self.RectHeight - self.DeltaRectHeight)
+                elif event.y < self.DeltaRectHeight + 3:
+                    self.ReplaceRect[0].x1 = event.x - self.DeltaRectWidth
+                    self.ReplaceRect[0].x2 = event.x + (self.RectWidth - self.DeltaRectWidth)
+                    self.ReplaceRect[0].y1 = 3
+                    self.ReplaceRect[0].y2 = 3 + self.RectHeight
+                elif event.y > self.canvas.winfo_height() - (self.RectHeight - self.DeltaRectHeight) - 3:
+                    self.ReplaceRect[0].x1 = event.x - self.DeltaRectWidth
+                    self.ReplaceRect[0].x2 = event.x + (self.RectWidth - self.DeltaRectWidth)
+                    self.ReplaceRect[0].y1 = self.canvas.winfo_height() - 3
+                    self.ReplaceRect[0].y2 = self.canvas.winfo_height() - 3 - self.RectHeight
+                else:
+                    self.ReplaceRect[0].x1 = event.x - self.DeltaRectWidth
+                    self.ReplaceRect[0].x2 = self.ReplaceRect[0].x1 + self.RectWidth
+                    self.ReplaceRect[0].y1 = event.y - self.DeltaRectHeight
+                    self.ReplaceRect[0].y2 = self.ReplaceRect[0].y1 + self.RectHeight
+
+                self.ReplaceRect[0].DrawRect(self.canvas)
+
+            if self.WallMotionFlag:
+
+                self.canvas.delete('Line')
+
+                if event.x < self.SettingsConf.CornerSize + 3 and \
+                        event.y < self.SettingsConf.CornerSize + 3:
+                    self.canvas.create_line(self.WallPosSTART[0], self.WallPosSTART[1],
+                                            self.SettingsConf.CornerSize + 3,
+                                            self.SettingsConf.CornerSize + 3,
+                                            width=self.SettingsConf.WallWidth, tag='Line',
+                                            fill=self.SettingsConf.WallColor)
+                elif event.x < self.SettingsConf.CornerSize + 3 and \
+                        event.y > self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3:
+                    self.canvas.create_line(self.WallPosSTART[0], self.WallPosSTART[1],
+                                            self.SettingsConf.CornerSize + 3,
+                                            self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3,
+                                            width=self.SettingsConf.WallWidth, tag='Line',
+                                            fill=self.SettingsConf.WallColor)
+                elif event.x > self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3 and \
+                        event.y < self.SettingsConf.CornerSize + 3:
+                    self.canvas.create_line(self.WallPosSTART[0], self.WallPosSTART[1],
+                                            self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3,
+                                            self.SettingsConf.CornerSize + 3,
+                                            width=self.SettingsConf.WallWidth, tag='Line',
+                                            fill=self.SettingsConf.WallColor)
+                elif event.x > self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3 and \
+                        event.y > self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3:
+                    self.canvas.create_line(self.WallPosSTART[0], self.WallPosSTART[1],
+                                            self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3,
+                                            self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3,
+                                            width=self.SettingsConf.WallWidth, tag='Line',
+                                            fill=self.SettingsConf.WallColor)
+                elif event.x < self.SettingsConf.CornerSize + 3:
+                    self.canvas.create_line(self.WallPosSTART[0], self.WallPosSTART[1],
+                                            self.SettingsConf.CornerSize + 3, event.y,
+                                            width=self.SettingsConf.WallWidth, tag='Line',
+                                            fill=self.SettingsConf.WallColor)
+                elif event.x > self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3:
+                    self.canvas.create_line(self.WallPosSTART[0], self.WallPosSTART[1],
+                                            self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3, event.y,
+                                            width=self.SettingsConf.WallWidth, tag='Line',
+                                            fill=self.SettingsConf.WallColor)
+                elif event.y < self.SettingsConf.CornerSize + 3:
+                    self.canvas.create_line(self.WallPosSTART[0], self.WallPosSTART[1],
+                                            event.x, self.SettingsConf.CornerSize + 3,
+                                            width=self.SettingsConf.WallWidth, tag='Line',
+                                            fill=self.SettingsConf.WallColor)
+                elif event.y > self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3:
+                    self.canvas.create_line(self.WallPosSTART[0], self.WallPosSTART[1],
+                                            event.x, self.canvas.winfo_height() - self.SettingsConf.CornerSize - 3,
+                                            width=self.SettingsConf.WallWidth, tag='Line',
+                                            fill=self.SettingsConf.WallColor)
+                else:
+                    self.canvas.create_line(self.WallPosSTART[0], self.WallPosSTART[1], event.x, event.y,
+                                            width=self.SettingsConf.WallWidth, tag='Line',
+                                            fill=self.SettingsConf.WallColor)
+
+            if self.RectMotionFlag:
+
+                self.canvas.delete('Rect')
+
+                if event.x < 3 and event.y < 3:
+                    self.canvas.create_rectangle(self.RectPosSTART[0], self.RectPosSTART[1],
+                                                 3, 3,
+                                                 width=self.SettingsConf.RectWidth, tag='Rect',
+                                                 outline=self.SettingsConf.RectColor)
+                elif event.x < 3 and event.y > self.canvas.winfo_height() - 3:
+                    self.canvas.create_rectangle(self.RectPosSTART[0], self.RectPosSTART[1],
+                                                 3, self.canvas.winfo_height() - 3,
+                                                 width=self.SettingsConf.RectWidth, tag='Rect',
+                                                 outline=self.SettingsConf.RectColor)
+                elif event.x > self.canvas.winfo_width() - 3 and event.y < + 3:
+                    self.canvas.create_rectangle(self.RectPosSTART[0], self.RectPosSTART[1],
+                                                 self.canvas.winfo_width() - 3, 3,
+                                                 width=self.SettingsConf.RectWidth, tag='Rect',
+                                                 outline=self.SettingsConf.RectColor)
+                elif event.x > self.canvas.winfo_width() - 3 and event.y > self.canvas.winfo_height() - 3:
+                    self.canvas.create_rectangle(self.RectPosSTART[0], self.RectPosSTART[1],
+                                                 self.canvas.winfo_width() - 3,
+                                                 self.canvas.winfo_height() - 3,
+                                                 width=self.SettingsConf.RectWidth, tag='Rect',
+                                                 outline=self.SettingsConf.RectColor)
+                elif event.x < self.SettingsConf.CornerSize + 3:
+                    self.canvas.create_rectangle(self.RectPosSTART[0], self.RectPosSTART[1],
+                                                 3, event.y,
+                                                 width=self.SettingsConf.RectWidth, tag='Rect',
+                                                 outline=self.SettingsConf.RectColor)
+                elif event.x > self.canvas.winfo_width() - self.SettingsConf.CornerSize - 3:
+                    self.canvas.create_rectangle(self.RectPosSTART[0], self.RectPosSTART[1],
+                                                 self.canvas.winfo_width() - 3, event.y,
+                                                 width=self.SettingsConf.RectWidth, tag='Rect',
+                                                 outline=self.SettingsConf.RectColor)
+                elif event.y < self.SettingsConf.CornerSize + 3:
+                    self.canvas.create_rectangle(self.RectPosSTART[0], self.RectPosSTART[1],
+                                                 event.x, 3,
+                                                 width=self.SettingsConf.RectWidth, tag='Rect',
+                                                 outline=self.SettingsConf.RectColor)
+                elif event.y > self.canvas.winfo_height() - 3:
+                    self.canvas.create_rectangle(self.RectPosSTART[0], self.RectPosSTART[1],
+                                                 event.x, self.canvas.winfo_height() - 3,
+                                                 width=self.SettingsConf.RectWidth, tag='Rect',
+                                                 outline=self.SettingsConf.RectColor)
+                else:
+                    self.canvas.create_rectangle(self.RectPosSTART[0], self.RectPosSTART[1],
+                                                 event.x, event.y,
+                                                 width=self.SettingsConf.RectWidth, tag='Rect',
+                                                 outline=self.SettingsConf.RectColor)
+
+        def Mouse_Wheel(event):
+
+            for oval in self.OvalMas:
+                if event.x < oval.x + oval.OvalSize and event.x > oval.x - oval.OvalSize and \
+                        event.y < oval.y + oval.OvalSize and event.y > oval.y - oval.OvalSize:
+                    if event.delta == 120:
+                        self.canvas.delete(oval.OvalTag)
+                        oval.OvalSize += 1
+                        oval.DrawOval(self.canvas)
+                    elif event.delta == -120:
+                        self.canvas.delete(oval.OvalTag)
+                        oval.OvalSize -= 1
+                        oval.DrawOval(self.canvas)
+
+            for rect in self.RectMas:
+                if event.x > rect.x1 and event.x < rect.x2  and event.y > rect.y1 and event.y < rect.y2:
+
+                    if event.delta == 120:
+
+                        self.canvas.delete(rect.RectTag)
+
+                        if rect.x1 == 3 and rect.y1 == 3:
+                            rect.x2 += 1
+                            rect.y2 += 1
+                        elif rect.x1 == 3 and rect.y2 == self.canvas.winfo_height() - 3:
+                            rect.x2 += 1
+                            rect.y1 -= 1
+                        elif rect.x2 == self.canvas.winfo_width() - 3 and rect.y1 == 3:
+                            rect.x1 -= 1
+                            rect.y2 += 1
+                        elif rect.x2 == self.canvas.winfo_width() - 3 and rect.y2 == self.canvas.winfo_height() - 3:
+                            rect.x1 -= 1
+                            rect.y1 -= 1
+                        elif rect.x1 == 3:
+                            rect.x2 += 1
+                            rect.y1 -= 1
+                            rect.y2 += 1
+                        elif rect.x2 == self.canvas.winfo_width() - 3:
+                            rect.x1 -= 1
+                            rect.y1 -= 1
+                            rect.y2 += 1
+                        elif rect.y1 == 3:
+                            rect.x1 -= 1
+                            rect.x2 += 1
+                            rect.y2 += 1
+                        elif rect.y2 == self.canvas.winfo_height() - 3:
+                            rect.x1 -= 1
+                            rect.x2 += 1
+                            rect.y1 -= 1
+                        else:
+                            rect.x1 -= 1
+                            rect.x2 += 1
+                            rect.y1 -= 1
+                            rect.y2 += 1
+
+                        rect.DrawRect(self.canvas)
+
+                    elif event.delta == -120:
+
+                        self.canvas.delete(rect.RectTag)
+
+                        rect.x1 += 1
+                        rect.x2 -= 1
+                        rect.y1 += 1
+                        rect.y2 -= 1
+
+                        rect.DrawRect(self.canvas)
+
+        self.tk = Tk()
+        self.WIDTHSCREEN = self.tk.winfo_screenwidth()
+        self.HEIGHTSCREEN = self.tk.winfo_screenheight()
+        self.tk.overrideredirect(True)
+        self.web_message_buffer = []
+        self.tk.minsize(width=int(self.WIDTHSCREEN / 3 * 2), height=int(self.HEIGHTSCREEN / 5 * 4))
+        self.tk.maxsize(width=int(self.WIDTHSCREEN / 3 * 2), height=int(self.HEIGHTSCREEN / 5 * 4))
+        self.tk.wm_geometry("+%d+%d" % (int(self.WIDTHSCREEN / 2 - self.WIDTHSCREEN / 3 * 2 / 2),
+                                        int(self.HEIGHTSCREEN / 2 - self.HEIGHTSCREEN / 5 * 4 / 2)))
+        self.tk["bg"] = "light grey"
+
+        self.canvas = Canvas(self.tk, bg='white')
+        self.canvas.pack()
+        self.canvas.place(x=0, y=50, width=int(self.WIDTHSCREEN / 3 * 2), height=int(self.HEIGHTSCREEN / 5 * 4 - 50))
+        self.canvas.update()
+
+        self.ButClose = Button(text='×', bg='red', command=self.Close_program, bd=1, font=("Arial", 20))
+        self.ButClose.pack()
+        self.ButClose.place(x=int(self.WIDTHSCREEN / 3 * 2 - 30), y=5, width=25, height=25)
+
+        self.ButBeacon = Button(text='●', bg='light grey', command=self.BeaconButton, bd=4, font=("Arial", 20))
+        self.ButBeacon.pack()
+        self.ButBeacon.place(x=5, y=5, width=40, height=40)
+
+        self.ButOval = Button(text='◯', bg='light grey', command=self.OvalButton, bd=4, font=("Arial", 20))
+        self.ButOval.pack()
+        self.ButOval.place(x=45, y=5, width=40, height=40)
+
+        self.ButWall = Button(text='╲', bg='light grey', command=self.WallButton, bd=4, font=("Arial", 20))
+        self.ButWall.pack()
+        self.ButWall.place(x=125, y=5, width=40, height=40)
+
+        self.ButRect = Button(text='▭', bg='light grey', command=self.RectButton, bd=4, font=("Arial", 40))
+        self.ButRect.pack()
+        self.ButRect.place(x=85, y=5, width=40, height=40)
+
+        self.ButConnect = Button(text='---', bg='light grey', command=self.ConnectButton, bd=4, font=("Arial", 20))
+        self.ButConnect.pack()
+        self.ButConnect.place(x=425, y=5, width=40, height=40)
+
+        self.canvas.bind('<ButtonPress-1>', Mouse_Press)
+        self.canvas.bind('<ButtonPress-3>', Mouse_Press_DELETE)
+        self.canvas.bind('<ButtonRelease-1>', Mouse_Release)
+        self.canvas.bind('<Motion>', Mouse_Motion)
+        self.canvas.bind("<MouseWheel>", Mouse_Wheel)
+
+        self.SettingsConf = Settings()
+
+        self.BeaconCount = 0
+        self.OvalCount = 0
+        self.WallCount = 0
+        self.RectCount = 0
+
+        self.BeaconMas = []
+        self.OvalMas = []
+        self.WallMas = []
+        self.RectMas = []
+
+        self.BeaconFlag = False
+        self.OvalFlag = False
+        self.WallFlag = False
+        self.RectFlag = False
+
+        self.OvalMotionFlag = False
+        self.WallMotionFlag = False
+        self.RectMotionFlag = False
+
+        self.ReplaceBeaconFlag = False
+        self.ReplaceBeacon = []
+        self.ReplaceOvalFlag = False
+        self.ReplaceOval = []
+        self.ReplaceCorner1Flag = False
+        self.ReplaceCorner2Flag = False
+        self.ReplaceWall = []
+        self.ReplaceRectFlag = False
+        self.ReplaceRect = []
+
+        self.ConnectFlag = False
+
+        self.OvalPosSTART = []
+        self.WallPosSTART = []
+        self.RectPosSTART = []
+        self.OvalPosFINISH = []
+        self.WallPosFINISH = []
+        self.RectPosFINISH = []
+        self.OvalWidth = 0
+        self.OvalHeight = 0
+        self.DeltaOvalWidth = 0
+        self.DeltaOvalHeight = 0
+        self.RectWidth = 0
+        self.RectHeight = 0
+        self.DeltaRectWidth = 0
+        self.DeltaRectHeight = 0
+
+    def Close_program(self):
+
+        self.tk.destroy()
+
+    def BeaconButton(self):
+
+        if self.BeaconFlag:
+            self.BeaconFlag = False
+            self.ButBeacon["bg"] = "light grey"
+        else:
+            self.BeaconFlag = True
+            self.ButBeacon["bg"] = "grey"
+            self.OvalFlag = False
+            self.ButOval["bg"] = "light grey"
+            self.WallFlag = False
+            self.ButWall["bg"] = "light grey"
+            self.RectFlag = False
+            self.ButRect["bg"] = "light grey"
+
+    def OvalButton(self):
+
+        if self.OvalFlag:
+            self.OvalFlag = False
+            self.ButOval["bg"] = "light grey"
+        else:
+            self.OvalFlag = True
+            self.ButOval["bg"] = "grey"
+            self.BeaconFlag = False
+            self.ButBeacon["bg"] = "light grey"
+            self.WallFlag = False
+            self.ButWall["bg"] = "light grey"
+            self.RectFlag = False
+            self.ButRect["bg"] = "light grey"
+
+    def WallButton(self):
+
+        if self.WallFlag:
+            self.WallFlag = False
+            self.ButWall["bg"] = "light grey"
+        else:
+            self.WallFlag = True
+            self.ButWall["bg"] = "grey"
+            self.BeaconFlag = False
+            self.ButBeacon["bg"] = "light grey"
+            self.OvalFlag = False
+            self.ButOval["bg"] = "light grey"
+            self.RectFlag = False
+            self.ButRect["bg"] = "light grey"
+
+    def RectButton(self):
+
+        if self.RectFlag:
+            self.RectFlag = False
+            self.ButRect["bg"] = "light grey"
+        else:
+            self.RectFlag = True
+            self.ButRect["bg"] = "grey"
+            self.BeaconFlag = False
+            self.ButBeacon["bg"] = "light grey"
+            self.OvalFlag = False
+            self.ButOval["bg"] = "light grey"
+            self.WallFlag = False
+            self.ButWall["bg"] = "light grey"
+
+    def ConnectButton(self):
+
+        self.Connect_Beacon()
+
+
+window = Main_project()
+window.tk.mainloop()
